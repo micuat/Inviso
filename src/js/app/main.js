@@ -54,8 +54,12 @@ export default class Main {
     }
     else if(oscMsg.address == "/inviso/head/rotation") {
       if (this.head && !this.isEditingObject) {
-        this.axisHelper.rotation.y = oscMsg.args[0];
-        this.head.rotation.y = oscMsg.args[0];
+        this.axisHelper.rotation.x = oscMsg.args[0];
+        this.head.rotation.x = oscMsg.args[0];
+        this.axisHelper.rotation.y = oscMsg.args[1];
+        this.head.rotation.y = oscMsg.args[1];
+        this.axisHelper.rotation.z = oscMsg.args[2];
+        this.head.rotation.z = oscMsg.args[2];
       }
     }
   }
