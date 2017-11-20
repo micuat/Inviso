@@ -29,7 +29,61 @@ let rS, bS, glS, tS;
 // This class instantiates and ties all of the components together
 // starts the loading process and renders the main loop
 export default class Main {
+  onOscReceive(oscMsg) {
+    //console.log("An OSC message just arrived!", oscMsg);
+    if(oscMsg.address == "/inviso/volume") {
+      //console.log("set volume");
+      var sounds = [].concat(this.soundObjects, this.soundZones);
+
+      sounds.forEach(sound => {
+        if(sound.volume != null)
+          sound.volume.gain.value = oscMsg.args[0];
+      });
+    }
+    else if(oscMsg.address == "/inviso/position") {
+      //console.log("set position", oscMsg.args[0]);
+      var sounds = [].concat(this.soundObjects, this.soundZones);
+
+      sounds.forEach(sound => {
+        sound.setPosition({
+          x: oscMsg.args[0],
+          y: oscMsg.args[1],
+          z: oscMsg.args[2]
+        });
+      });
+    }
+    else if(oscMsg.address == "/inviso/head/rotation") {
+      if (this.head && !this.isEditingObject) {
+        this.axisHelper.rotation.y = oscMsg.args[0];
+        this.head.rotation.y = oscMsg.args[0];
+      }
+    }
+  }
+  onOscOpen() {
+    console.log("websocket connected!!");
+  }
+  onOscClose() {
+    console.log("websocket disconnected!!");
+  }
+  openOsc() {
+      if(this.oscPort.socket == null || this.oscPort.socket.readyState != 1) {
+        this.oscPort.open();
+      }
+  }
+  onOscError() {
+    console.log("websocket error!!");
+  }
   constructor(container) {
+    this.oscPort = new osc.WebSocketPort({
+        url: "ws://localhost:8081"
+    });
+
+    this.oscPort.on("message", this.onOscReceive.bind(this));
+    this.oscPort.on("open", this.onOscOpen.bind(this));
+    this.oscPort.on("close", this.onOscClose.bind(this));
+    this.oscPort.on("error", this.onOscError.bind(this));
+    setInterval(this.openOsc.bind(this), 1000);
+
     OBJLoader(THREE);
     this.overrideTriangulate();
     this.setupAudio();

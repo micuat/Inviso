@@ -81,5 +81,8 @@ module.exports = {
       }
     ]
   },
-  plugins: plugins
+  plugins: plugins,
+  externals: {
+    osc: 'osc'
+  }
 };

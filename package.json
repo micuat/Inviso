@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "es6-promise": "^4.0.5",
+    "osc": "2.2.0",
     "three": "^0.87.0",
     "three-obj-loader": "^1.1.0",
     "tween.js": "16.6.0",
@@ -42,6 +43,6 @@
     "webpack-dev-server": "^1.16.2"
   },
   "engines": {
-    "node": "8.3.0"
+    "node": "8.9.1"
   }
 }
