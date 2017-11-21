@@ -23,6 +23,10 @@ import GUIWindow from './managers/guiwindow';
 // data
 import Config from './../data/config';
 
+import SoundObject from './components/soundobject';
+import SoundTrajectory from './components/soundtrajectory';
+import SoundZone from './components/soundzone';
+
 // Local vars for rStats
 let rS, bS, glS, tS;
 
@@ -32,16 +36,28 @@ export default class Main {
   onOscReceive(oscMsg) {
     //console.log("An OSC message just arrived!", oscMsg);
     if(oscMsg.address == "/inviso/volume") {
-      //console.log("set volume");
       var sounds = [].concat(this.soundObjects, this.soundZones);
 
       sounds.forEach(sound => {
-        if(sound.volume != null)
-          sound.volume.gain.value = oscMsg.args[0];
+        if(sound.omniSphere.sound != null)
+          sound.omniSphere.sound.volume.gain.value = oscMsg.args[0];
       });
     }
+    if(oscMsg.address == "/inviso/volume/decrement") {
+      var sounds = [].concat(this.soundObjects, this.soundZones);
+
+      for(var i = sounds.length - 1; i >= 0; i--) {
+        var sound = sounds[i];
+        if(sound.omniSphere.sound != null) {
+          sound.omniSphere.sound.volume.gain.value -= oscMsg.args[0];
+          // destroy if 0
+          if(sound.omniSphere.sound.volume.gain.value <= 0) {
+            this.removeSoundObject(sound)
+          }
+        }
+      }
+    }
     else if(oscMsg.address == "/inviso/position") {
-      //console.log("set position", oscMsg.args[0]);
       var sounds = [].concat(this.soundObjects, this.soundZones);
 
       sounds.forEach(sound => {
@@ -61,6 +77,14 @@ export default class Main {
         this.axisHelper.rotation.z = oscMsg.args[2];
         this.head.rotation.z = oscMsg.args[2];
       }
+    }
+    else if(oscMsg.address == "/inviso/object/add") {
+      this.soundObjects.push(new SoundObject(this));
+      this.soundObjects[this.soundObjects.length-1].setPosition({
+        x: oscMsg.args[0],
+        y: oscMsg.args[1],
+        z: oscMsg.args[2]
+      });
     }
   }
   onOscOpen() {
