@@ -79,12 +79,16 @@ export default class Main {
       }
     }
     else if(oscMsg.address == "/inviso/object/add") {
-      this.soundObjects.push(new SoundObject(this));
-      this.soundObjects[this.soundObjects.length-1].setPosition({
-        x: oscMsg.args[0],
-        y: oscMsg.args[1],
-        z: oscMsg.args[2]
-      });
+      if(this.soundObjects.length > 0) {
+        this.soundObjects.push(new SoundObject(this));
+        this.soundObjects[this.soundObjects.length-1].fromJSON("{\"filename\":\"Recording (2).m4a\",\"volume\":1,\"position\":{\"x\":-73.85643787205083,\"y\":2.767493605536094e-14,\"z\":226.03475320350967},\"movementSpeed\":5,\"cones\":[]}",
+        {"Recording (2).m4a": this.soundObjects[0].file});
+        this.soundObjects[this.soundObjects.length-1].setPosition({
+          x: oscMsg.args[0],
+          y: oscMsg.args[1],
+          z: oscMsg.args[2]
+        });
+      }
     }
   }
   onOscOpen() {
