@@ -46,7 +46,7 @@ export default class Main {
     if(oscMsg.address == "/inviso/volume/decrement") {
       var sounds = [].concat(this.soundObjects, this.soundZones);
 
-      for(var i = sounds.length - 1; i >= 0; i--) {
+      for(var i = sounds.length - 1; i >= 3; i--) {
         var sound = sounds[i];
         if(sound.omniSphere.sound != null) {
           sound.omniSphere.sound.volume.gain.value -= oscMsg.args[0];
@@ -79,10 +79,11 @@ export default class Main {
       }
     }
     else if(oscMsg.address == "/inviso/object/add") {
-      if(this.soundObjects.length > 0) {
+      let tmplIndex = oscMsg.args[3];
+      if(this.soundObjects.length > tmplIndex) {
         this.soundObjects.push(new SoundObject(this));
         this.soundObjects[this.soundObjects.length-1].fromJSON("{\"filename\":\"Recording (2).m4a\",\"volume\":1,\"position\":{\"x\":-73.85643787205083,\"y\":2.767493605536094e-14,\"z\":226.03475320350967},\"movementSpeed\":5,\"cones\":[]}",
-        {"Recording (2).m4a": this.soundObjects[0].file});
+        {"Recording (2).m4a": this.soundObjects[tmplIndex].file});
         this.soundObjects[this.soundObjects.length-1].setPosition({
           x: oscMsg.args[0],
           y: oscMsg.args[1],
