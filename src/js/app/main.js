@@ -35,7 +35,7 @@ let rS, bS, glS, tS;
 export default class Main {
   onOscReceive(oscMsg) {
     //console.log("An OSC message just arrived!", oscMsg);
-    if(oscMsg.address == "/inviso/volume") {
+    if(oscMsg.address == "/inviso/volume/all") {
       var sounds = [].concat(this.soundObjects, this.soundZones);
 
       sounds.forEach(sound => {
@@ -43,7 +43,14 @@ export default class Main {
           sound.omniSphere.sound.volume.gain.value = oscMsg.args[0];
       });
     }
-    if(oscMsg.address == "/inviso/volume/decrement") {
+    else if(oscMsg.address == "/inviso/volume") {
+      var index = oscMsg.args[0];
+      if(this.soundObjects.length > index) {
+        if(this.soundObjects[index].omniSphere.sound != null)
+          this.soundObjects[index].omniSphere.sound.volume.gain.value = oscMsg.args[1];
+      }
+    }
+    else if(oscMsg.address == "/inviso/volume/decrement") {
       var sounds = [].concat(this.soundObjects, this.soundZones);
 
       for(var i = sounds.length - 1; i >= 3; i--) {
