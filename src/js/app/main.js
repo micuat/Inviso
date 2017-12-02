@@ -480,27 +480,40 @@ export default class Main {
 
     requestAnimationFrame(this.render.bind(this)); // Bind the main class instead of window object
 
-    if(this.soundObjects.length > 0) {
-      let total = 0;
-      this.soundObjects.forEach(sound => {
-        if(sound.omniSphere.sound != null) {
-          var s = sound.containerObject.position;
-          var dist = s.length();
-          dist = dist / 300.0;
-          if(dist > 1) dist = 1;
-          dist = 1 - dist;
-          let v = sound.omniSphere.sound.volume.gain.value;
-          if(v > 1) v = 1;
+    if(this.head != null) {
+      let nz = new THREE.Vector3(0, 0, -1);
+      nz.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.head.rotation.y);
+      if(this.soundObjects.length > 0) {
+        let total = 0;
+        this.soundObjects.forEach(sound => {
+          if(sound.omniSphere.sound != null) {
+            let s = sound.containerObject.position;
+            let dist = s.length(); // distance
+            dist = dist / 300.0;
+            if(dist < 0) dist = 0;
+            if(dist > 1) dist = 1;
+            dist = 1 - dist;
 
-          total += dist * v;
-        }
-      });
-      if(total > 1) total = 1;
+            let backness = s.dot(nz); // how close the object to the back of the user
+            backness = backness / 300.0;
+            if(backness < 0) backness = 0;
+            if(backness > 1) backness = 1;
 
-      this.oscPort.send({
-        address: "/subpac/gain",
-        args: [total]
-      });
+            let amp = (dist + backness * 0.5);
+
+            let v = sound.omniSphere.sound.volume.gain.value;
+            if(v > 1) v = 1;
+
+            total += amp * v;
+          }
+        });
+        if(total > 1) total = 1;
+
+        this.oscPort.send({
+          address: "/subpac/gain",
+          args: [total]
+        });
+      }
     }
   }
 
