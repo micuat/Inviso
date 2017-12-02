@@ -479,6 +479,29 @@ export default class Main {
     this.gui.display(this.activeObject);
 
     requestAnimationFrame(this.render.bind(this)); // Bind the main class instead of window object
+
+    if(this.soundObjects.length > 0) {
+      let total = 0;
+      this.soundObjects.forEach(sound => {
+        if(sound.omniSphere.sound != null) {
+          var s = sound.containerObject.position;
+          var dist = s.length();
+          dist = dist / 300.0;
+          if(dist > 1) dist = 1;
+          dist = 1 - dist;
+          let v = sound.omniSphere.sound.volume.gain.value;
+          if(v > 1) v = 1;
+
+          total += dist * v;
+        }
+      });
+      if(total > 1) total = 1;
+
+      this.oscPort.send({
+        address: "/subpac/gain",
+        args: [total]
+      });
+    }
   }
 
   setupAudio() {
